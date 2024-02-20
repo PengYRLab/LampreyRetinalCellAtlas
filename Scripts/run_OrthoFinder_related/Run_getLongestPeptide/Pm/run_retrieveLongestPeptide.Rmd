@@ -1,0 +1,28 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+source the functions
+```{r}
+source("/Users/mumu/Documents/bioSoft/bioSoft/R_mumu_utilities/OrthoFinderUtilities/functions/getLongestPep_v0.2_20220220/Function_GetLongestPep.R")
+
+```
+
+
+
+run
+```{r}
+
+# set the directory
+setwd("/Users/mumu/Documents/research/LampreyRetina/analysis/OrthoFinder/proteinSeq/Pm_lamprey")
+
+# run
+GetLongestPep(filein_cds="cds_from_genomic.fna",
+              filein_pep="protein.faa",
+              fileout_pep.longest="Pm.longest.pep.ncbi.fa")
+
+# The end!
+```
+
