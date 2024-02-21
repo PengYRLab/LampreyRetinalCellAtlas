@@ -1,5 +1,5 @@
 # Scripts
-## This directory includes the scripts and run examples
+## This directory includes the scripts and examples running the scripts
 
 Author Junqiang Wang
 
