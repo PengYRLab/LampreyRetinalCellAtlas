@@ -7,13 +7,13 @@ This directory includes scripts used for the analyses.
 
 **Data preprocessing when running OthoFinder**
 
-*** Cell type annotation using SingleR ***
+**Cell type annotation using SingleR**
 
-*** Cross-species integration ***
+**Cross-species integration**
 
-*** Differentially expressed gene analysis using Stouffer's integration methood ***
+**Differentially expressed gene analysis using Stouffer's integration methood**
 
-*** Transcriptome mapping use XGBoost ***
+**Transcriptome mapping use XGBoost**
 
-*** Protein activity analysis using Rosea ***
+**Protein activity analysis using Rosea**
 
