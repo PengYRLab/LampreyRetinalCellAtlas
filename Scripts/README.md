@@ -1,8 +1,9 @@
-# Scripts
-## This directory includes the scripts and examples running the scripts
+## Scripts
 
-Author Junqiang Wang
+### Author Junqiang Wang
 
-Latest update 2024-02-20
+### Latest update 2024-02-20
 
-Please contact the email junqiangwang333@gmail.com if you have any questions.
+This directory includes the scripts and examples running the scripts.
+
+If you have any questions, please feel free to contact me at junqiangwang333@gmail.com.
