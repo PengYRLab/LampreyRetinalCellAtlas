@@ -9,6 +9,10 @@ This directory includes scripts used for the analyses. The scripts perform the t
 
 **Cell type annotation using SingleR**
 
+**Dimension Reduction**
+
+**Hierarchical clustering**
+
 **Cross-species integration**
 
 **Differentially expressed gene analysis using Stouffer's integration methood**
@@ -16,4 +20,7 @@ This directory includes scripts used for the analyses. The scripts perform the t
 **Transcriptome mapping use XGBoost**
 
 **Protein activity analysis using Rosea**
+
+### Data
+This directory includes data used for the analyses.
 
