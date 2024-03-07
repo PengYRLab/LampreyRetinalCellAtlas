@@ -5,7 +5,7 @@ Please cite the paper if you used the scripts or the data https://www.biorxiv.or
 ### Scripts
 This directory includes scripts used for the analyses.
 
-*** Data preprocessing when running OthoFinder ***
+**Data preprocessing when running OthoFinder**
 
 *** Cell type annotation using SingleR ***
 
