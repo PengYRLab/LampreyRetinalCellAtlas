@@ -13,7 +13,7 @@ This directory includes scripts used for the analyses. The scripts perform the t
 
 **Hierarchical clustering**
 
-**Cross-species integration**
+**Cross-species integration using orthogous group assigned by OrthoFinder**
 
 **Differentially expressed gene analysis using Stouffer's integration methood**
 
