@@ -1,6 +1,10 @@
 # LampreyRetinalCellAtlas
 Please cite the paper if you used the scripts or the data https://www.biorxiv.org/content/10.1101/2023.12.10.571000v1.abstract
 
+# Maintainer
+Junqiang Wang 
+Emails: junqiangwang333@gmail.com
+
 ## Directories 
 ### Scripts
 This directory includes scripts used for the analyses. The scripts perform the tasks listed below:
