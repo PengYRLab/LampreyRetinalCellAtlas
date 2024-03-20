@@ -1,0 +1,68 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+source the functions
+```{r}
+source("/Users/mumu/Documents/research/LampreyRetina/analysis/OrthoFinder/functions/Converting_GeneID_to_Symbol_v0.1_20240220/Convert_GeneID_to_Symbol_for_fa_UseEnsemblAnn.R")
+
+```
+
+
+run on Human
+```{r}
+
+filein_ensembl_annotation_path<-"/Users/mumu/Documents/research/LampreyRetina/analysis/OrthoFinder/Data_source_2/ensembl_gene_annotation/mart_export_ensembl_gene_annotation_EnsemblGenes111_GRCh38.p14_Human.txt"
+
+filein_pep_path<-"/Users/mumu/Documents/research/LampreyRetina/analysis/OrthoFinder/proteinSeq/longestPeptide/Hs_human.fa"
+
+
+GeneID_2_Symbol_UseEnsemblAnn(filein_ensembl_annotation_path=filein_ensembl_annotation_path, 
+                              filein_pep_path=filein_pep_path,
+                              fileout="Human.fa"
+                              )
+
+# The end!
+```
+
+run on Mouse
+```{r}
+
+filein_ensembl_annotation_path<-"/Users/mumu/Documents/research/LampreyRetina/analysis/OrthoFinder/Data_source_2/ensembl_gene_annotation/mart_export_ensembl_gene_annotation_EnsemblGenes111_GRCm39_Mouse.txt"
+
+filein_pep_path<-"/Users/mumu/Documents/research/LampreyRetina/analysis/OrthoFinder/proteinSeq/longestPeptide/Mm_mouse.fa"
+
+
+GeneID_2_Symbol_UseEnsemblAnn(filein_ensembl_annotation_path=filein_ensembl_annotation_path, 
+                              filein_pep_path=filein_pep_path,
+                              fileout="Mouse.fa"
+                              )
+
+# The end!
+```
+
+
+
+
+run on Zebrafish
+```{r}
+
+filein_ensembl_annotation_path<-"/Users/mumu/Documents/research/LampreyRetina/analysis/OrthoFinder/Data_source_2/ensembl_gene_annotation/mart_export_ensembl_gene_annotation_EnsemblGenes111_GRCz11_Zebrafish.txt"
+
+filein_pep_path<-"/Users/mumu/Documents/research/LampreyRetina/analysis/OrthoFinder/proteinSeq/longestPeptide/Dr_zebrafish.fa"
+
+
+GeneID_2_Symbol_UseEnsemblAnn(filein_ensembl_annotation_path=filein_ensembl_annotation_path, 
+                              filein_pep_path=filein_pep_path,
+                              fileout="Zebrafish.fa"
+                              )
+
+# The end!
+```
+
+
+
+
+
