@@ -9,7 +9,7 @@ This directory includes scripts used for the analyses. The scripts perform the t
 
 **Cell type annotation using SingleR**
 
-**Dimension reduction**
+**Dimension reduction and clustering analysis using Seurat**
 
 **Hierarchical clustering**
 
