@@ -26,7 +26,7 @@ This directory includes data used for the analyses.
 
 
 
-## Maintainer
+## Code Author and Maintainer
 Junqiang Wang 
 Emails: junqiangwang333@gmail.com
 
