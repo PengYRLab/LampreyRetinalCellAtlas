@@ -3,7 +3,7 @@ Please cite the paper if you used the scripts or the data https://www.biorxiv.or
 
 ## Directories 
 ### Functions and Scripts
-This directory includes functions written from scratch and scripts used for the analyses. The scripts perform the tasks listed below:
+This directory includes functions written from scratch and scripts used for the analyses. The functions and scripts perform the tasks listed below:
 
 **Data preprocessing when running OthoFinder**
 
