@@ -29,7 +29,7 @@ This directory includes data used for the analyses.
 ## Code Author and Maintainer
 Junqiang Wang
 
-Emails: junqiangwang333@gmail.com
+Email: junqiangwang333@gmail.com
 
 @Peng Lab 
 website: [](https://yirongpeng.com)https://yirongpeng.com
