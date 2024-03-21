@@ -2,8 +2,8 @@
 Please cite the paper if you used the scripts or the data https://www.biorxiv.org/content/10.1101/2023.12.10.571000v1.abstract
 
 ## Directories 
-### Scripts
-This directory includes scripts used for the analyses. The scripts perform the tasks listed below:
+### Functions and Scripts
+This directory includes functions written from scratch and scripts used for the analyses. The scripts perform the tasks listed below:
 
 **Data preprocessing when running OthoFinder**
 
