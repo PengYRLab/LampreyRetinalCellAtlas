@@ -1,5 +1,7 @@
 # LampreyRetinalCellAtlas
-Please cite the paper if you used the scripts or the data https://www.biorxiv.org/content/10.1101/2023.12.10.571000v1.abstract
+
+# How to cite
+Please cite https://www.biorxiv.org/content/10.1101/2023.12.10.571000v1.abstract
 
 ## Directories 
 ### Functions and Scripts
