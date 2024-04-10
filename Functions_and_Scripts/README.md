@@ -1,4 +1,4 @@
-## Scripts
+## Functions and Scripts
 
 ### Author Junqiang Wang
 
