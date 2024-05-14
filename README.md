@@ -3,6 +3,9 @@
 ## How to cite
 Please cite https://www.biorxiv.org/content/10.1101/2023.12.10.571000v1.abstract
 
+## A framework for cross-species integration of scRNA-Seq of evolutionarily distant species
+
+
 ## Directories 
 ### Functions and Scripts
 This directory includes functions written from scratch and scripts used for the analyses. The functions and scripts perform the tasks listed below:
