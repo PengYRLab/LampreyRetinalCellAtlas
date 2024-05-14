@@ -5,6 +5,7 @@ Please cite https://www.biorxiv.org/content/10.1101/2023.12.10.571000v1.abstract
 
 ## A framework for cross-species integration of scRNA-Seq of evolutionarily distant species
 
+<img src="/Illustrative_Figures/Figure_cross-species_integration_framework_png_v0.6.png" width="200" height="200">
 
 ## Directories 
 ### Functions and Scripts
