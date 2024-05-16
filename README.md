@@ -33,7 +33,7 @@ This directory includes data used for the analyses.
 
 
 
-## Code Author and Maintainer
+## Code Author
 Junqiang Wang
 
 Email: junqiangwang333@gmail.com
