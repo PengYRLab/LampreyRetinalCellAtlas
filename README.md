@@ -5,7 +5,7 @@
 This directory includes functions written from scratch. 
 
 ### Tutorial
-This directory includes subdirectoris with scripts used for the analyses. The scripts perform the analysis tasks.
+This directory includes sub-directories with scripts used for the analyses. The scripts perform the analysis tasks.
 
 **Cell type annotation using SingleR**
 
