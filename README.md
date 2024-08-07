@@ -17,7 +17,7 @@ This directory includes sub-directories with scripts used for the analyses. The 
 
 **Protein activity analysis using Rosa**
 
-### Data
+### LampreyData
 This directory includes data used for the analyses.
 
 ## How to cite
