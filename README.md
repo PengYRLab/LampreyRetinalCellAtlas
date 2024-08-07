@@ -5,11 +5,11 @@
 This directory includes functions written from scratch. 
 
 ### Tutorial
-This directory includes sub-directories with scripts used for the analyses. The scripts perform the analysis tasks.
+This directory includes sub-directories with scripts used for the analyses. The scripts perform the following analysis tasks:
 
 **Cell type annotation using SingleR**
 
-**Dimension reduction and clustering analysis using Seurat**
+**Dimension reduction and clustering analysis**
 
 **Cross-species integration**
 
