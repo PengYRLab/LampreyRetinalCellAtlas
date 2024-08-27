@@ -28,5 +28,3 @@ Junqiang Wang
 
 Email: junqiangwang333@gmail.com
 
-@Peng Lab 
-website: [](https://yirongpeng.com)https://yirongpeng.com
