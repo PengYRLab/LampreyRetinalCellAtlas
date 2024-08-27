@@ -1,0 +1,101 @@
+---
+title: "XGBoost_mapping"
+# output: html_document
+date: "2024-03-19"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Load the packages
+```{r}
+library(dplyr)
+library(Seurat)
+library(xgboost)
+```
+
+
+Load the functions
+```{r}
+
+functions_path<-"../TranscriptomeMapping_pipeline_v0.5_20240416"
+
+
+file.sources = list.files(functions_path, pattern="*.R", full.names=TRUE)
+
+sapply(file.sources,source,.GlobalEnv)
+```
+
+
+Load the data
+```{r}
+load("RGC_integrated.mouse.lamprey.rda")
+```
+
+
+TMapping
+```{r}
+
+dir<-"figures_TMapping_ordered_LampreyRef_cutoff50"
+
+dir
+
+if(dir.exists(dir)==FALSE){
+  
+  dir.create(dir)
+  
+}
+
+setwd(dir)
+getwd()
+
+# Transcriptome mapping
+# seu@meta.data$cell_type<-seu@meta.data$subtype
+
+seu@meta.data$species<-seu@meta.data$species %>% as.factor()
+seu@meta.data$cell_type<-seu@meta.data$cell_type %>% as.factor()
+seu@meta.data$cell_type
+
+xg_data<-SeuIntegrated2TM(
+  seu,
+  assay="integrated",
+  seu.idents="species",
+  seu.train.idents="lamprey",
+  seu.test.idents="mouse",
+  label.train="cell_type",
+  label.test="cell_type"
+)
+
+save(xg_data, file="xg_data.rda")
+
+xgb_model<-RunTransciptomeMappingTrain(xg_data)
+
+```
+
+
+```{r}
+
+dir<-"figures_TMapping_ordered_LampreyRef_cutoff50"
+dir
+
+if(dir.exists(dir)==FALSE){
+  
+  dir.create(dir)
+  
+}
+
+setwd(dir)
+getwd()
+
+X<-RunTransciptomeMappingPrediction(xg_data=xg_data,
+                                           xgb_model=xgb_model,
+                                      p_cutoff=0)
+
+ggsave(file="classifier's_prediction_UsePCutoff0_UseDiagonal.pdf", width=9 , height=8)
+
+save(X, file="X_UsePCutoff0_UseDiagonal.cutoff30.rda")
+
+```
+
