@@ -3,7 +3,7 @@
 
 
 
-# Please follow the tutorialat https://github.com/califano-lab/ARACNe-AP.
+# Please follow the tutorial at https://github.com/califano-lab/ARACNe-AP.
 
 
 #-------------- run aracne threshold
