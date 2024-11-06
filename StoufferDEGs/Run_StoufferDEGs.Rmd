@@ -1,0 +1,351 @@
+---
+title: "Stouffer's DEG analysis"
+#output: html_document
+
+---
+
+
+Load the packages
+```{r}
+
+library(dplyr)
+library(Seurat)
+library(patchwork)
+library(ggplot2)
+library(tidyverse)
+library(RColorBrewer)
+library(stringr)
+
+set.seed(777)
+
+```
+
+
+Load the functions
+```{r}
+
+dir<-"StoufferDEG_v0.1"
+files = list.files(path=dir, pattern="*.R",  full.names = TRUE)
+sapply(files, source) %>% invisible()
+
+dir<-"TranscriptomeMapping_v0.4"
+files = list.files(path=dir, pattern="*.R",  full.names = TRUE)
+sapply(files, source) %>% invisible()
+
+source("FeatureDotPlot_v0.4.R")
+```
+
+
+
+Set the plot theme
+```{r}
+
+gg.theme<-theme(
+  title=element_blank(),
+  axis.line=element_blank(),
+  axis.text.x=element_blank(),
+  axis.text.y=element_blank(),
+  axis.ticks=element_blank(),
+  axis.title.x=element_blank(),
+  axis.title.y=element_blank(),
+  legend.position="none",
+  panel.background=element_blank(),
+  panel.border=element_blank(),
+  panel.grid.major=element_blank(),
+  panel.grid.minor=element_blank(),
+  plot.background = element_rect(color = "black", linewidth = 0.5)
+)
+
+
+#
+gg.theme2<-theme(
+  axis.line=element_blank(),
+  axis.text.x=element_blank(),
+  axis.text.y=element_blank(),
+  axis.ticks=element_blank(),
+  axis.title.x=element_blank(),
+  axis.title.y=element_blank(),
+  panel.background=element_blank(),
+  panel.border=element_blank(),
+  panel.grid.major=element_blank(),
+  panel.grid.minor=element_blank(),
+  plot.background=element_blank(),
+)
+
+```
+
+
+Load the integration data
+```{r}
+
+load("RGC_integrated.mouse.lamprey.rda")
+
+```
+
+
+Load the classification matrix
+```{r}
+
+load("X.rda")
+
+```
+
+
+Get the integrated clusters from the classification matrix
+```{r}
+
+assigned_orthotype<-AssignOrthotype(X=X,
+                          ann_data=seu@meta.data,
+                          col_name_ref="subtype",
+                          col_name_add="orthotype",
+                          percent_cutoff=50,
+                          simplify_orthotype=FALSE
+                          )
+
+ann_data<-assigned_orthotype$ann_data
+
+seu@meta.data<-ann_data
+
+hash_orthotype<-assigned_orthotype$hash_orthotype
+
+orthotypes<-assigned_orthotype$match_orders
+
+orthotypes
+
+# 
+
+```
+
+```{r}
+seu[['RNA']]<-as(seu[['RNA']], Class="Assay")
+
+#
+tmp<-grep(":", seu@meta.data$orthotype, invert=TRUE)
+
+seu@meta.data$orthotype_simplified<-seu@meta.data$orthotype
+
+seu@meta.data$orthotype_simplified[tmp]<-"Unconserved"
+```
+
+
+Find the DEGs and infer the DEGs from different samples using Stouffer's method
+```{r}
+
+seu.marker.list<-GetMarkersByBatches(seu,
+                              idents="orthotype_simplified",
+                              batch="species",
+                              de.method="MAST",
+                              pct.1=NULL,
+                              pct.2=NULL)
+
+
+save(seu.marker.list, file="markers.stouffer.list.rda")
+
+
+
+```
+
+
+Do filtering
+```{r}
+
+load("markers.stouffer.list.rda")
+
+markers.stouffer<-GetDEGsByStouffer(seu.marker.list=seu.marker.list,
+                                    remove.na=TRUE
+                                    )
+
+markers.stouffer$cluster<-markers.stouffer$cluster %>% as.character()
+
+markers.stouffer %>% print(n=100)
+
+
+markers.stouffer <- markers.stouffer %>% 
+                    dplyr::filter(cluster!="Unconserved")
+
+
+#------------------Remove the MT and Ribosome genes
+
+tmp<-grep("^MT-|RP[SL][[:digit:]]", markers.stouffer$gene)
+
+if(length(tmp)>0){
+  
+  markers.stouffer<-markers.stouffer[-tmp,] 
+  
+}
+
+
+```
+
+
+
+reorder the group order by the orthotypes
+```{r}
+
+markers.stouffer$cluster<-factor(markers.stouffer$cluster, levels=intersect(orthotypes, unique(markers.stouffer$cluster)))
+
+markers.stouffer<-markers.stouffer %>%
+                  arrange(cluster)
+
+```
+
+
+Dot plot
+```{r}
+
+dir<-"figures_DEGs_LampreyRef"
+
+dir 
+
+if(dir.exists(dir)==FALSE){
+  
+  dir.create(dir)
+  
+}
+
+setwd(dir)
+
+
+#
+top<-markers.stouffer %>%
+  ungroup() %>%
+  arrange(desc(z.stouffer)) %>%
+  distinct(gene, .keep_all = TRUE) %>%
+  filter(avg_log2FC.x>0.5 & avg_log2FC.y>0.5) %>%
+  filter(pct.1.x>0.2 & pct.1.y>0.2) %>%
+   filter(p_val_adj.x<1e-2 & p_val_adj.y<1e-2) %>%
+    group_by(cluster) %>%
+    slice_head(n = 1) %>%
+    ungroup()
+
+markers<-top$gene
+
+Idents(seu)<-"orthotype"
+
+seu.i<-subset(seu, idents=orthotypes)
+
+p<-FeatureDotPlot(seu=seu.i,
+                         markers=markers, 
+                         split.by="species",
+                         group.by="orthotype",
+                         max.cutoff = 1.5,
+                         levels.markers=NULL,
+                         levels.split.by=NULL,
+                         levels.group.by=as.character(unique(top$cluster))
+                         )
+
+p
+
+ggsave(file="featuredotplot.top1.pdf", width=12, height=5)
+
+```
+
+
+Edit orthotype names
+```{r}
+
+dir<-"figures_DEGs_LampreyRef"
+
+dir 
+
+if(dir.exists(dir)==FALSE){
+  
+  dir.create(dir)
+  
+}
+
+setwd(dir)
+
+
+# Change the colnames
+
+tmp<-p$data$Id
+levels<-levels(tmp)
+
+tmp<-as.character(tmp)
+
+symbols<-sapply(tmp, FUN=function(x){
+  
+  tmpi<-grep("lamprey", x)
+  
+  if(length(tmpi)==1){
+    x<-str_split(x, pattern=":", simplify = TRUE)[1,1]
+  }else{
+    
+     x<-str_split(x, pattern=":|_mouse", simplify = TRUE)[1,2]
+     x<-paste0(x, "(Mm)")
+  }
+  return(x)
+  
+})
+
+symbols<-unname(symbols)
+
+
+levels<-sapply(levels, FUN=function(x){
+  
+  tmpi<-grep("lamprey", x)
+  
+  if(length(tmpi)==1){
+    x<-str_split(x, pattern=":", simplify = TRUE)[1,1]
+  }else{
+    
+     x<-str_split(x, pattern=":|_mouse", simplify = TRUE)[1,2]
+     x<-paste0(x, "(Mm)")
+  }
+  return(x)
+  
+})
+
+symbols<-unname(symbols)
+levels<-unname(levels)
+
+p$data$Id<-symbols
+p$data$Id<-factor(p$data$Id, levels=levels)
+
+
+# Change the rownames
+genes<-p$data$Gene
+levels<-levels(p$data$Gene)
+
+tmp<-str_split(genes, pattern=":", simplify = TRUE)
+genes.new<-paste0(tmp[,2], ":", tmp[,1])
+p$data$Gene<-genes.new
+
+
+tmp<-str_split(levels, pattern=":", simplify = TRUE)
+levels.new<-paste0(tmp[,2], ":", tmp[,1])
+p$data$Gene<-factor(p$data$Gene, levels=levels.new)
+
+p
+
+ggsave(file="featuredotplot.top1.pdf", width=12, height=5)
+
+```
+
+
+```{r}
+dir<-"figures_DEGs_LampreyRef"
+
+dir 
+
+if(dir.exists(dir)==FALSE){
+  
+  dir.create(dir)
+  
+}
+
+setwd(dir)
+
+
+p
+
+ggsave(file="featuredotplot.top.simplified.pdf", width=7, height=4.2)
+```
+
+
+
+
+
+
+

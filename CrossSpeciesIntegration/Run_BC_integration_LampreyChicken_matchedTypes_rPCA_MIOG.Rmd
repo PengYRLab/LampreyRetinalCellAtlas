@@ -1,0 +1,971 @@
+---
+title: "R Notebook"
+# output: html_notebook
+---
+
+
+
+Load the libraries
+```{r}
+
+# rm(list=ls())
+
+library(dplyr)
+library(Seurat)
+library(patchwork)
+library(ggplot2)
+library(tidyverse)
+library(lubridate)
+library(RColorBrewer)
+library(stringr)
+library(ComplexHeatmap)
+library(varhandle)
+library(ggpubr)
+library(Seurat)
+library(cowplot)
+library(dplyr)
+library(hash)
+
+options(ggrepel.max.overlaps = Inf)
+
+set.seed(777)
+
+```
+
+
+Load custome-written functions
+```{r}
+
+dir<-"Rutilities_v0.1"
+
+files = list.files(path=dir, full.names = TRUE)
+
+files
+
+sapply(files, source)
+
+
+dir<-"IntegrationUsingOrthogroup_v0.1"
+
+files = list.files(path=dir, pattern="*.R",  full.names = TRUE)
+
+files
+
+sapply(files, source)
+
+
+dir<-"StoufferDEG_v0.1"
+
+files = list.files(path=dir, pattern="*.R",  full.names = TRUE)
+
+files
+
+sapply(files, source)
+
+dir<-"TranscriptomeMapping_v0.4"
+
+files = list.files(path=dir, pattern="*.R",  full.names = TRUE)
+
+files
+
+sapply(files, source)
+
+
+
+```
+
+
+Load the chicken dataset
+```{r}
+
+load("seu.chicken.retina.e18.harmony.wenjunyan.rda")
+
+seu
+
+p1<-DimPlot(seu, reduction = "umap", group.by="subtype", label = TRUE, raster=FALSE, label.box=FALSE)
+p1
+
+seu@meta.data$subtype %>% table()
+
+tmp<-grep("BP-", seu@meta.data$subtype)
+
+seu@meta.data$bp<-0
+
+seu@meta.data$bp[tmp]<-1
+
+
+Idents(seu)<-"bp"
+
+seu<-subset(seu, idents=1)
+
+seu@meta.data$subtype %>% table()
+
+tmp<-seu@meta.data$orig.ident %>% table() %>% sort(decreasing = TRUE) %>% names()
+
+Idents(seu)<-"orig.ident"
+
+seu<-subset(seu, idents=tmp[c(1,2)])
+
+```
+
+
+
+Edit the subclass
+```{r}
+
+tmp<-seu@meta.data$subtype %>% as.character()
+
+tmp[tmp %in% c("BP-4", "BP-14", "BP-19")]<-"RBC"
+tmp[tmp %in% c("BP-1", "BP-9", "BP-22", "BP-18", "BP-3", "BP-13", "BP-10", "BP-21")]<-"ON BC"
+tmp[tmp %in% c("BP-12", "BP-15", "BP-8", "BP-5", "BP-7", "BP-11", "BP-16", "BP-17", "BP-2", "BP-6", "BP-20")]<-"OFF BC"
+
+seu@meta.data$subclass<-tmp
+
+tmp %>% table() 
+
+```
+
+
+
+
+```{r}
+
+ Idents(seu)<-"subtype"
+ seu<-subset(seu, idents=c("BP-14", "BP-4", "BP-9", "BP-6" ,"BP-2", "BP-11", "BP-15"))
+```
+
+
+downsampling
+```{r}
+
+Idents(seu)<-"subtype"
+
+seu<-subset(seu, downsample=200)
+
+seu@meta.data$cell_type<-seu@meta.data$subtype
+
+seu@meta.data$species<-"chicken"
+
+seu.chicken<-seu
+
+```
+
+
+
+Load the lamprey dataset
+```{r}
+
+load("lamprey.BC.types.rda")
+
+Idents(seu)<-"orig.ident"
+
+```
+
+
+
+Edit the subclass
+```{r}
+
+tmp1<-seu@meta.data$subtype %>% as.character()
+
+# lamprey
+tmp<-which(tmp1 %in% c("BC3"))
+tmp1[tmp]<-"ON BC"
+#
+tmp<-which(tmp1 %in% c("BC1", "BC5"))
+tmp1[tmp]<-"RBC"
+
+#
+tmp<-which(tmp1 %in% c("BC4", "BC8", "BC7", "BC2", "BC6"))
+tmp1[tmp]<-"OFF BC"
+tmp1 %>% table()
+#
+seu@meta.data$subclass<-tmp1
+```
+
+
+
+Load the lamprey dataset
+```{r}
+
+
+
+VlnPlot(seu, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+
+
+VlnPlot(seu, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+
+#
+seu<-subset(seu, nFeature_RNA>700)
+
+VlnPlot(seu, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+
+
+seu@meta.data$sample<-seu@meta.data$orig.ident
+
+seu@meta.data$subtype %>% unique() %>% sort()
+
+p1<-DimPlot(seu, reduction = "umap",
+            group.by="subtype",
+            label = TRUE,
+            repel=TRUE,
+            cols=col_vector,
+            raster=FALSE,
+            label.box=FALSE)
+p1
+p1<-p1+gg.theme+labs(title="")
+p1
+
+
+
+#
+p1<-DimPlot(seu, reduction = "umap",
+            group.by="seurat_clusters",
+            label = TRUE,
+            repel=TRUE,
+            cols=col_vector,
+            raster=FALSE,
+            label.box=FALSE)
+p1
+p1<-p1+gg.theme+labs(title="")
+p1
+
+
+Idents(seu)<-"subtype"
+
+seu<-subset(seu, downsample=50)
+
+DefaultAssay(seu)<-"RNA"
+
+seu@meta.data$orig.ident<-seu@meta.data$orig.ident %>% as.vector() %>% as.factor()
+
+seu@meta.data$species<-"lamprey"
+
+seu@meta.data$cell_type<-seu@meta.data$subtype
+
+seu@meta.data$cell_type<-paste0(seu@meta.data$cell_type, "_Lamprey")
+
+seu@meta.data$subtype2<-seu@meta.data$subtype
+
+seu.lamprey<-seu
+
+seu@meta.data$subtype %>% table()
+
+rm(seu)
+
+
+```
+
+
+
+Assay converting
+```{r}
+seu.chicken[["RNA"]]<-as(object=seu.chicken[["RNA"]], Class="Assay")
+seu.lamprey[["RNA"]]<-as(object=seu.lamprey[["RNA"]], Class="Assay")
+
+```
+
+
+
+
+
+```{r}
+
+seu<-seu.lamprey
+
+Idents(seu)<-"orig.ident"
+
+samples<-seu@meta.data$orig.ident %>% table() %>% sort(decreasing = TRUE) %>% names()
+
+seu<-subset(seu, idents=samples[1])
+
+seu<-seu%>% NormalizeData() %>% FindVariableFeatures() 
+
+seu<-ScaleData(seu, features =rownames(seu))
+
+seu[['RNA']]<-as(seu[['RNA']], Class="Assay")
+
+seu.lamprey.1<-seu
+
+```
+
+
+
+
+```{r}
+
+seu<-seu.chicken
+  
+Idents(seu)<-"orig.ident"
+
+samples<-seu@meta.data$orig.ident %>% table() %>% sort(decreasing = TRUE) %>% names()
+
+seu<-subset(seu, idents=samples[1])
+
+DefaultAssay(seu)<-"RNA"
+
+seu<-seu%>% NormalizeData() %>% FindVariableFeatures() 
+
+seu<-ScaleData(seu, features =rownames(seu))
+
+seu[['RNA']]<-as(seu[['RNA']], Class="Assay")
+
+seu.chicken.1<-seu
+```
+
+
+
+
+
+Edit orthgroup table
+```{r}
+
+genes_lamprey<-rownames(seu.lamprey)
+genes_chicken<-rownames(seu.chicken)
+
+
+table<-read.table(file="Lamprey__v__Chicken.tsv",
+                  fill=TRUE,
+                  sep="\t",
+                  header=TRUE)
+
+
+# Filtering the genes in the table not present in the expression matrix
+tmp<-FilterOrthologuesByExpression(x=table$Lamprey,
+                                   y=genes_lamprey)
+
+table$Lamprey<-tmp
+
+# 
+tmp<-FilterOrthologuesByExpression(x=table$Chicken,
+                                   y=genes_chicken)
+
+table$Chicken<-tmp
+
+
+table<-table %>%
+  dplyr::filter(Lamprey!="NA") %>%
+  dplyr::filter(Chicken!="NA")
+
+
+table <-  FilterOrthoByOrthoSize(x=table, size_max = 5)
+
+
+# Select the best matched 
+
+table<-GetBestOrthologuesBySD(ortho_group_table=table,
+                               exp_mat=seu.lamprey.1@assays$RNA@scale.data,
+                              species="Lamprey",
+                              pattern=","
+                              )
+
+
+table<-GetBestOrthologuesBySD( ortho_group_table=table,
+                              exp_mat=seu.chicken.1@assays$RNA@scale.data,
+                              species="Chicken",
+                              pattern=","
+                              )
+
+
+dim(table)
+
+
+
+# remove the rows including the NA values
+table<-table %>%
+  dplyr::filter(Lamprey!="NA") %>%
+  dplyr::filter(Chicken!="NA")
+
+table<-apply(table, MARGIN=c(1,2), FUN=MakeOrthoUnique)
+
+table <-  FilterOrthoByOrthoSize(x=table, size_max = 5)
+
+# Remove duplicated lines
+table<-unique(table,  MARGIN=1)
+
+rownames(table)<-table$Orthogroup %>% make.unique()
+
+ortho_group_table_reference<-table
+
+save(ortho_group_table_reference, file="ortho_group_table_reference.rda")
+
+
+```
+
+
+Aggregate expressions for orthogroups
+```{r}
+
+mat<-AggregateOrthoGroup(exp_mat=seu.lamprey@assays$RNA@counts,
+                              ortho_group_table=ortho_group_table_reference,
+                              column_species_index=2,
+                              pattern=","
+)
+
+
+mat<-OrthogroupID2GeneSymbol(mat=mat,
+                                  orthogroup_table=ortho_group_table_reference,
+                                  reference_species=c("Chicken", "Lamprey")
+                                  )
+
+dim(mat)
+
+mat[1:3,1:3]
+
+df<-seu.lamprey@meta.data
+
+meta_data<-df[, -which(colnames(df) %in% c("nCount_RNA", "nFeature_RNA"))]
+
+seu.lamprey<-CreateSeuratObject(counts=mat, meta.data =meta_data)
+
+seu.lamprey@meta.data$cell_type %>% table()
+
+#------------------------------------
+# for the chicken
+
+mat<-AggregateOrthoGroup(exp_mat=seu.chicken@assays$RNA@counts,
+                              ortho_group_table=ortho_group_table_reference,
+                              column_species_index=3,
+                              pattern=","
+)
+
+
+mat<-OrthogroupID2GeneSymbol(mat=mat,
+                                  orthogroup_table=ortho_group_table_reference,
+                                  reference_species=c("Chicken", "Lamprey")
+                                  )
+
+dim(mat)
+
+mat[1:3,1:3]
+
+dim(mat)
+
+df<-seu.chicken@meta.data
+
+meta_data<-df[, -which(colnames(df) %in% c("nCount_RNA", "nFeature_RNA"))]
+
+seu.chicken<-CreateSeuratObject(counts=mat, meta.data = meta_data)
+
+seu.chicken@meta.data$cell_type %>% table()
+
+
+```
+
+
+
+
+Merge the datasets 
+```{r}
+
+seu<-merge(x=seu.lamprey, y=seu.chicken)
+
+tmp<-seu.lamprey@meta.data$orig.ident %>% unique() %>% length()
+
+
+```
+
+
+Do integration
+```{r}
+
+#
+seu@meta.data$species<- seu@meta.data$species %>% as.factor()
+seu@meta.data$orig.ident<- seu@meta.data$orig.ident %>% as.factor()
+
+#
+Idents(seu)<-"orig.ident"
+
+DefaultAssay(seu)<-"RNA"
+
+seu.list<-SplitObject(seu, split.by = "orig.ident")
+
+seu.list
+
+seu.list <- lapply(X = seu.list, 
+                   FUN = SCTransform, 
+                   method = "glmGamPoi", 
+                   vst.flavor = "v1",
+                   conserve.memory=FALSE, 
+                   return.only.var.genes=TRUE)
+
+
+features1<-SelectIntegrationFeatures(object.list = seu.list[c(1:tmp)], nfeatures = 3000)
+features2<-SelectIntegrationFeatures(object.list = seu.list[-c(1:tmp)], nfeatures = 3000)
+features<-intersect(features1, features2)
+
+
+seu.list <- PrepSCTIntegration(object.list = seu.list, anchor.features = features)
+
+seu.list <- lapply(X = seu.list, FUN = function(x) {
+  x <- RunPCA(x, features = features, verbose = FALSE)
+})
+
+
+```
+
+
+
+Do integration 
+```{r}
+
+#
+anchors <- FindIntegrationAnchors(object.list = seu.list, 
+               
+                                  normalization.method = "SCT", 
+                                  scale=TRUE,
+                                  anchor.features = features,
+                                  reduction = "rpca",
+                                  k.anchor = 20,
+                                  dims = 1:50)
+
+# rm(seu.list)
+
+
+```
+
+```{r}
+
+seu <- IntegrateData(anchorset = anchors, 
+                     normalization.method = "SCT", 
+                    # k.weight = 50,
+                     dims = 1:50)
+
+# rm(anchors)
+
+```
+
+
+
+
+```{r}
+DefaultAssay(seu)<-"integrated"
+
+seu <- RunPCA(seu, verbose = FALSE)
+seu <- RunUMAP(seu, reduction = "pca", dims = 1:50)
+seu <- FindNeighbors(seu, reduction = "pca", dims = 1:50)
+seu <- FindClusters(seu, resolution = 0.8)
+
+seu@meta.data$seurat_clusters<-seu@meta.data$seurat_clusters %>% as.numeric() %>% as.factor()
+
+seu@meta.data$integrated_clusters<-seu@meta.data$seurat_clusters
+```
+
+
+Plot the integration
+```{r}
+
+dir_out<-"figures_integration"
+
+if(! dir.exists(dir_out)){
+  
+  dir.create(dir_out)
+}
+
+setwd(dir_out)
+
+
+# Do plot 
+# cols2<-c("grey", "red")
+
+ cols2<-c("grey", "blue")
+
+# cols2<-c("#B5CA16", "#EE6C84")
+
+p1<-DimPlot(seu, reduction = "umap", 
+            group.by = "species", 
+            order=rev(rownames(seu@meta.data)),
+            label = FALSE, 
+            cols=cols2,
+            repel=TRUE)
+
+p1
+
+p1<-p1+gg.theme3
+
+p1
+
+file<- paste0("Dimplot_species", ".pdf")
+
+ggsave(file=file, width=5.5, height=5)
+
+
+#--
+# cols2<-c("grey", "blue")
+
+p1<-DimPlot(seu, reduction = "umap", 
+            group.by = "seurat_clusters", 
+            order=rev(rownames(seu@meta.data)),
+            label = TRUE, 
+            repel=TRUE)
+
+p1
+
+p1<-p1+gg.theme3
+
+p1
+
+file<- paste0("Dimplot_seurat_clusters", ".pdf")
+
+ggsave(file=file, width=5.5, height=5)
+
+
+
+
+#------
+
+p1<-DimPlot(seu, reduction = "umap", 
+            group.by = "species", 
+            order=rev(rownames(seu@meta.data)),
+            label = FALSE, 
+            cols=cols2,
+            repel=TRUE)
+
+p1
+
+p1<-p1+gg.theme3+NoLegend()
+
+p1
+
+p11<-p1
+
+file<- paste0("Dimplot_species_Nolgend_width5.5_height5", ".pdf")
+
+ggsave(file=file, width=5.5, height=5)
+
+
+
+#------subtype 
+
+Idents(seu)<-"species"
+
+seu.lamprey<-subset(seu, idents="lamprey")
+
+seu.chicken<-subset(seu, idents="chicken")
+
+
+p3<-DimPlot(seu.lamprey, reduction = "umap", 
+            group.by="subtype", 
+            cols=col_vector,
+            label = TRUE, repel=TRUE)
+
+p3
+
+p3<-p3+gg.theme3
+
+p3
+
+
+file<- paste0("Dimplot_subtypes_lamprey", ".pdf")
+
+ggsave(file=file, width=6, height=5)
+
+
+#------
+
+p3<-DimPlot(seu.lamprey, reduction = "umap", 
+            group.by="subtype", 
+            cols=col_vector,
+            label = TRUE, repel=TRUE)
+
+p3
+
+p3<-p3+gg.theme3+NoLegend()
+
+p3
+
+p22<-p3
+
+file<- paste0("Dimplot_subtypes_lamprey_Nolgend_width5.5_height5", ".pdf")
+
+ggsave(file=file, width=5.5, height=5)
+
+
+
+#-------------lamprey
+
+p3<-DimPlot(seu.chicken, reduction = "umap", 
+            group.by="subtype", 
+            cols=col_vector,
+            label = TRUE, repel=TRUE)
+
+p3
+
+p3<-p3+gg.theme3
+
+p3
+
+file<- paste0("Dimplot_subtypes_chicken", ".pdf")
+
+ggsave(file=file, width=6, height=5)
+
+
+#-----------
+
+p3<-DimPlot(seu.chicken, reduction = "umap", 
+            group.by="subtype", 
+            cols=col_vector,
+            label = TRUE, 
+            repel=TRUE)
+
+p3
+
+p3<-p3+gg.theme3+NoLegend()
+
+p3
+
+p33<-p3
+
+file<- paste0("Dimplot_subtypes_chicken_Nolgend_width5.5_height5", ".pdf")
+
+ggsave(file=file, width=5.5, height=5)
+
+
+#--------split by species
+
+p4<-DimPlot(seu, reduction = "umap", group.by="subtype", label = TRUE, 
+            repel=TRUE, split.by = "species",
+            ncol=2)+NoLegend()
+
+p4
+
+file<- paste0("Dimplot_subtypes_splitbySpeceis", ".pdf")
+
+ggsave(file=file, width=5, height=10)
+
+
+```
+
+
+plot the combined figures
+```{r}
+
+dir_out<-"figures_integration"
+
+if(! dir.exists(dir_out)){
+  
+  dir.create(dir_out)
+}
+
+setwd(dir_out)
+
+wrap_plots(list(p11, p22, p33), ncol = 3)
+
+ggsave("dimplot.integrated.pdf", width=15, height=5)
+
+
+```
+
+
+
+Plot the integration
+```{r}
+
+dir_out<-"figures_integration"
+
+if(! dir.exists(dir_out)){
+  
+  dir.create(dir_out)
+}
+
+setwd(dir_out)
+
+
+# Do plot 
+# cols2<-c("grey", "red")
+
+ cols2<-c("grey", "blue")
+
+# cols2<-c("#B5CA16", "#EE6C84")
+
+p1<-DimPlot(seu, reduction = "umap", 
+            group.by = "species", 
+            order=rev(rownames(seu@meta.data)),
+            label = FALSE, 
+            cols=cols2,
+            repel=TRUE)
+
+p1
+
+p1<-p1+gg.theme3
+
+p1
+
+file<- paste0("Dimplot_species", ".pdf")
+
+ggsave(file=file, width=5.5, height=5)
+
+
+#--
+# cols2<-c("grey", "blue")
+
+p1<-DimPlot(seu, reduction = "umap", 
+            group.by = "seurat_clusters", 
+            order=rev(rownames(seu@meta.data)),
+            label = TRUE, 
+            repel=TRUE)
+
+p1
+
+p1<-p1+gg.theme3
+
+p1
+
+file<- paste0("Dimplot_seurat_clusters", ".pdf")
+
+ggsave(file=file, width=5.5, height=5)
+
+
+
+
+#------
+
+p1<-DimPlot(seu, reduction = "umap", 
+            group.by = "species", 
+            order=rev(rownames(seu@meta.data)),
+            label = FALSE, 
+            cols=cols2,
+            repel=TRUE)
+
+p1
+
+p1<-p1+gg.theme3+NoLegend()
+
+p1
+
+p11<-p1
+
+file<- paste0("Dimplot_species_Nolgend_width5.5_height5", ".pdf")
+
+ggsave(file=file, width=5.5, height=5)
+
+
+
+#------subtype 
+
+Idents(seu)<-"species"
+
+seu.lamprey<-subset(seu, idents="lamprey")
+
+seu.chicken<-subset(seu, idents="chicken")
+
+
+p3<-DimPlot(seu.lamprey, reduction = "umap", 
+            group.by="subtype", 
+            cols=col_vector,
+            label = TRUE, repel=TRUE)
+
+p3
+
+p3<-p3+gg.theme3
+
+p3
+
+
+file<- paste0("Dimplot_subtypes_lamprey", ".pdf")
+
+ggsave(file=file, width=6, height=5)
+
+
+#------
+
+p3<-DimPlot(seu.lamprey, reduction = "umap", 
+            group.by="subclass", 
+            cols=col_vector,
+            label = TRUE, repel=TRUE)
+
+p3
+
+p3<-p3+gg.theme3+NoLegend()
+
+p3
+
+p22<-p3
+
+file<- paste0("Dimplot_subtypes_lamprey_Nolgend_width5.5_height5", ".pdf")
+
+ggsave(file=file, width=5.5, height=5)
+
+
+
+#-------------lamprey
+
+p3<-DimPlot(seu.chicken, reduction = "umap", 
+            group.by="subtype", 
+            cols=col_vector,
+            label = TRUE, repel=TRUE)
+
+p3
+
+p3<-p3+gg.theme3
+
+p3
+
+file<- paste0("Dimplot_subtypes_chicken", ".pdf")
+
+ggsave(file=file, width=6, height=5)
+
+
+#-----------
+
+p3<-DimPlot(seu.chicken, reduction = "umap", 
+            group.by="subclass", 
+            cols=col_vector,
+            label = TRUE, 
+            repel=TRUE)
+
+p3
+
+p3<-p3+gg.theme3+NoLegend()
+
+p3
+
+p33<-p3
+
+file<- paste0("Dimplot_subtypes_chicken_Nolgend_width5.5_height5", ".pdf")
+
+ggsave(file=file, width=5.5, height=5)
+
+
+#--------split by species
+
+p4<-DimPlot(seu, reduction = "umap", group.by="subtype", label = TRUE, 
+            repel=TRUE, split.by = "species",
+            ncol=2)+NoLegend()
+
+p4
+
+file<- paste0("Dimplot_subtypes_splitbySpeceis", ".pdf")
+
+ggsave(file=file, width=5, height=10)
+
+
+```
+
+
+plot the combined figures
+```{r}
+
+dir_out<-"figures_integration"
+
+if(! dir.exists(dir_out)){
+  
+  dir.create(dir_out)
+}
+
+setwd(dir_out)
+
+wrap_plots(list(p11, p22, p33), ncol = 3)
+
+ggsave("dimplot.integrated.subclass.pdf", width=15, height=5)
+
+
+```
+
+
+
+
+
+
+
+

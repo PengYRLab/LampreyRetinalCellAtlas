@@ -1,0 +1,50 @@
+---
+title: "R Notebook"
+# output: html_notebook
+---
+
+Source the functions
+```{r}
+dir<-"ModelPerformanceEvaluation_v0.3"
+files<-list.files(dir, "*.R$", full.names=TRUE)
+files
+sapply(files,source,.GlobalEnv)
+```
+
+
+
+Load the confusion matrix
+```{r}
+
+load("X_UsePCutoff0_UseDiagonal.rda")
+
+X
+
+rowSums(X)
+
+X<-t(X)
+
+X<-X/100
+
+rowSums(X)
+```
+
+
+```{r}
+
+entropy<-NormalizedEntropy(x=X,
+                           trained_labels_in_column = TRUE
+                            )
+
+entropy
+
+```
+
+
+
+```{r}
+write.table(entropy, file="entropy.normalized.txt", sep="\t")
+```
+
+
+

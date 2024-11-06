@@ -1,0 +1,62 @@
+---
+title: "R Notebook"
+#output: html_notebook
+---
+
+load the libraries
+```{r}
+library(Seurat)
+```
+
+All classes
+```{r}
+load("seu.lamprey.all.class.rda")
+DimPlot(seu, group.by="class")
+```
+
+
+AC
+```{r}
+load("seu.lamprey.AC.types.rda")
+DimPlot(seu, group.by="subtype", label = TRUE)
+```
+
+BC
+```{r}
+load("seu.lamprey.BC.types.rda")
+DimPlot(seu, group.by="subtype", label = TRUE)
+```
+
+HC
+```{r}
+load("seu.lamprey.HC.types.rda")
+DimPlot(seu, group.by="subtype", label = TRUE)
+```
+
+MG
+```{r}
+load("seu.lamprey.MG.types.rda")
+DimPlot(seu, group.by="subtype", label = TRUE)
+```
+
+PR
+```{r}
+load("seu.lamprey.PR.types.rda")
+DimPlot(seu, group.by="subtype", reduction = "umap", label = TRUE)
+```
+
+RGC
+```{r}
+load("seu.lamprey.RGC.types.rda")
+DimPlot(seu, group.by="subtype", label = TRUE)
+```
+
+SAC
+```{r}
+load("seu.lamprey.SAC.types.rda")
+DimPlot(seu, group.by="subtype", label = TRUE)
+```
+
+
+
+
