@@ -1,11 +1,8 @@
 # LampreyRetinalCellAtlas
 
 ## Directories 
-### Functions
-This directory includes functions written from scratch. 
 
-### Tutorial
-This directory includes sub-directories with scripts used for the analyses. The scripts perform the following analysis tasks:
+The directories includes scripts used for the analyses. The scripts perform the following analysis tasks:
 
 **Cell type annotation using SingleR**
 
@@ -17,11 +14,7 @@ This directory includes sub-directories with scripts used for the analyses. The 
 
 **Protein activity analysis using Rosa**
 
-### LampreyData
-This directory includes data used for the analyses.
-
-## How to cite
-Please cite https://www.biorxiv.org/content/10.1101/2023.12.10.571000v1.abstract
+Function directories include functions written from scratch that are used in the analyses. 
 
 ## Code Author
 Junqiang Wang
