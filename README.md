@@ -2,11 +2,11 @@
 
 ## Directories 
 
-The directories includes scripts used for the analyses. The scripts perform the following analysis tasks:
+The directories include scripts used for the analyses. The scripts perform the following analysis tasks:
 
 **Cell type annotation using SingleR**
 
-**Dimension reduction and clustering analysis**
+**Dimensionality reduction and clustering analysis**
 
 **Cross-species integration**
 
@@ -14,7 +14,7 @@ The directories includes scripts used for the analyses. The scripts perform the 
 
 **Protein activity analysis using Rosa**
 
-Function directories include functions written from scratch that are used in the analyses. 
+The "Function" directories include functions written from scratch that are used in the analyses. 
 
 ## Code Author
 Junqiang Wang
